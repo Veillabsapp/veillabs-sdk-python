@@ -1,42 +1,61 @@
 """
-Example: Asynchronous Usage
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example: Unified Usage (Asynchronous)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This script demonstrates how to use the `AsyncVeilLabsClient` to perform
-concurrent API requests using Python's asyncio module. It showcases
-initializing the client with an async context manager and using
-asyncio.gather to fetch data efficiently.
+This script demonstrates how to work with multiple modules in a single
+Veil Labs async client session, including market estimates,
+proxy transfers, and transaction tracking.
 """
 
 import asyncio
-from veillabs import AsyncVeilLabsClient
+from veillabs import AsyncVeilLabsClient, SwapRequest
 
 
 async def main():
     """
-    Main entry point for the asynchronous usage example.
+    Main entry point for the async SDK usage example.
     """
-    # Initialize the asynchronous client
     async with AsyncVeilLabsClient() as client:
-        print("--- Veil Labs SDK (Async) ---")
+        print("--- Veil Labs SDK (Unified Async Usage) ---")
 
-        # 1. Fetch currencies concurrently (feature of async)
-        print("\nFetching market data...")
-        currencies_task = client.market.get_currencies()
-        stats_task = client.stats.get_volume()
+        # 1. Fetch available currencies asynchronously
+        markets = await client.market.get_currencies()
+        print(f"Registered Currencies: {len(markets)}")
 
-        currencies, stats = await asyncio.gather(currencies_task, stats_task)
+        # 2. Get an exchange estimate using the Pydantic model
+        # We define a SwapRequest and reuse its parameters for rate estimation
+        try:
+            swap_req = SwapRequest(
+                ticker_from="eth",
+                network_from="mainnet",
+                ticker_to="usdt",
+                network_to="mainnet",
+                amount="1.0",
+                address_to="0x123...",
+            )
 
-        print(f"Supported Currencies: {len(currencies)}")
-        print(f"Sample Currency: {currencies[0].ticker} ({currencies[0].name})")
-        print(f"\nTotal Platform Volume: ${stats.total_volume_usd:,.2f}")
+            # The get_estimate method accepts a dictionary or an EstimateRequest model
+            estimate = await client.market.get_estimate(
+                {
+                    "ticker_from": swap_req.ticker_from,
+                    "network_from": swap_req.network_from,
+                    "ticker_to": swap_req.ticker_to,
+                    "network_to": swap_req.network_to,
+                    "amount": swap_req.amount,
+                }
+            )
+            print(f"\nEstimate (1.0 ETH): {estimate.estimated_amount} USDT")
+            print(f"Trace ID: {estimate.trace_id}")
 
-        # 2. Get Trading Pairs (concurrently for top assets)
-        print("\nFetching pairs for eth/mainnet...")
-        pairs = await client.market.get_pairs("eth", "mainnet")
-        print(f"Available Destinations: {len(pairs)}")
-        for pair in pairs[:3]:
-            print(f"  - {pair.to_ticker} on {pair.to_network}")
+            # 3. Create a swap asynchronously
+            swap = await client.swap.create(swap_req)
+            print(f"\n✅ Swap created with ID: {swap.id}")
+            print(f"Status: {swap.status}")
+
+        except ValueError as e:
+            print(f"\n❌ API Error during async swap: {e}")
+        except Exception as e:
+            print(f"\n❌ Failed to execute async swap: {e}")
 
 
 if __name__ == "__main__":

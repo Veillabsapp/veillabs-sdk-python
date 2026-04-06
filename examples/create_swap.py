@@ -8,7 +8,7 @@ It demonstrates the use of the synchronous client for a sequential
 swap creation workflow.
 """
 
-from veillabs import VeilLabsClient
+from veillabs import VeilLabsClient, SwapRequest
 
 
 def main():
@@ -19,30 +19,45 @@ def main():
     with VeilLabsClient() as client:
         print("--- Veil Labs SDK (Private Swap Example) ---")
 
-        # 1. Define the Swap parameters
-        params = {
-            "from_ticker": "eth",
-            "from_network": "mainnet",
-            "to_ticker": "btc",
-            "to_network": "mainnet",
-            "amount": "0.1",
-            "address_to": "bc1q7x7...",  # Destination BTC address
-        }
+        # 1. Define the Swap parameters using the Pydantic model
+        # Note: We now use ticker_from, network_from, etc. to align with the API.
+        params = SwapRequest(
+            ticker_from="eth",
+            network_from="mainnet",
+            ticker_to="usdc",
+            network_to="mainnet",
+            amount="1.0",
+            address_to="0x1234567890abcdef1234567890abcdef12345678",
+        )
 
-        # 2. Estimate the swap first (recommended)
-        estimate = client.market.get_estimate(**params)
-        print(f"Estimated Output: {estimate.to_amount} BTC")
-        print(f"Current Rate: {estimate.rate}")
+        try:
+            # 2. Get an estimate first (recommended)
+            # The client accepts the SwapRequest model here too for convenience
+            estimate = client.market.get_estimate(
+                {
+                    "ticker_from": params.ticker_from,
+                    "network_from": params.network_from,
+                    "ticker_to": params.ticker_to,
+                    "network_to": params.network_to,
+                    "amount": params.amount,
+                }
+            )
+            print(f"Estimated Output: {estimate.estimated_amount} USDC")
+            print(f"Trace ID: {estimate.trace_id}")
 
-        # 3. Create the Swap (Uncomment to execute)
-        # try:
-        #     # In a real application, you would pass the actual destination address
-        #     swap = client.swap.create(**params)
-        #     print(f"\nSwap Created Successfully!")
-        #     print(f"Status: {swap.status}")
-        #     print(f"Tracking ID: {swap.id}")
-        # except Exception as e:
-        #     print(f"\nFailed to create swap: {e}")
+            # 3. Create the Swap
+            swap = client.swap.create(params)
+
+            print("\n✅ Swap Created Successfully!")
+            print(f"Transaction ID: {swap.id}")
+            print(f"Deposit Address: {swap.address_from}")
+            print(f"Status: {swap.status}")
+            print(f"Amount To Receive: {swap.amount_to} {swap.ticker_to}")
+
+        except ValueError as e:
+            print(f"\n❌ API Error: {e}")
+        except Exception as e:
+            print(f"\n❌ error: {e}")
 
 
 if __name__ == "__main__":

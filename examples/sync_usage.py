@@ -1,42 +1,57 @@
 """
-Example: Synchronous Usage
-~~~~~~~~~~~~~~~~~~~~~~~~
+Example: Unified Usage (Synchronous)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This script demonstrates how to use the synchronous `VeilLabsClient` to interact
-with the Veil Labs API. It covers initializing the client, fetching supported
-currencies, and retrieving platform statistics.
+This script demonstrates how to work with multiple modules in a single
+Veil Labs sync client session, including market estimates,
+proxy transfers, and transaction tracking.
 """
 
-from veillabs import VeilLabsClient
+from veillabs import VeilLabsClient, SwapRequest
 
 
 def main():
     """
-    Main entry point for the synchronous usage example.
+    Main entry point for the unified synchronous SDK example.
     """
-    # Initialize the synchronous client
-    # You can specify a custom base_url if needed
+    # 1. Initialize the client using context management
     with VeilLabsClient() as client:
-        print("--- Veil Labs SDK (Sync) ---")
+        print("--- Veil Labs SDK (Unified Sync Usage) ---")
 
-        # 1. Get supported currencies
-        print("\nFetching currencies...")
-        currencies = client.market.get_currencies()
-        featured = [c.ticker for c in currencies if c.is_featured]
-        print(f"Supported Currencies: {len(currencies)}")
-        print(f"Featured: {', '.join(featured)}")
+        # 2. Get available currencies
+        # markets = client.market.get_currencies()
+        # print(f"Registered Currencies: {len(markets)}")
 
-        # 2. Get platform volume
-        stats = client.stats.get_volume()
-        print(f"\nTotal Platform Volume: ${stats.total_volume_usd:,.2f}")
+        # 3. Create a swap
+        try:
+            swap_req = SwapRequest(
+                ticker_from="eth",
+                network_from="mainnet",
+                ticker_to="usdt",
+                network_to="mainnet",
+                amount="0.5",
+                address_to="0x123...",
+            )
+            swap = client.swap.create(swap_req)
+            print(f"Swap created with ID: {swap.id}")
 
-        # 3. Track a transaction (example ID)
-        # try:
-        #     status = client.track("0x123...")
-        #     print(f"\nTransaction Type: {status.type}")
-        #     print(f"Status: {status.status}")
-        # except Exception as e:
-        #     print(f"\nCould not track: {e}")
+            # 4. Check status of any transaction ID
+            # In a real scenario, you'd wait for funds to confirm
+            # status = client.track(swap.id)
+            # print(f"Transaction ID: {status.id} | Status: {status.status}")
+
+        except ValueError as e:
+            print(f"API Error during swap: {e}")
+        except Exception as e:
+            print(f"Failed to execute swap: {e}")
+
+        # 5. Get platform statistics
+        try:
+            stats = client.stats.get_volume()
+            print("\nPlatform Statistics:")
+            print(f"Total Trade Volume: ${stats.total_volume:.2f}")
+        except Exception as e:
+            print(f"Failed to fetch stats: {e}")
 
 
 if __name__ == "__main__":
