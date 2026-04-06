@@ -1,0 +1,17 @@
+[project]
+name = "veillabs-python-sdk"
+version = "0.1.0"
+description = "Veil Labs Python SDK for private market data, swaps, and transfers."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Veil Labs", email = "[EMAIL_ADDRESS]"},
+]
+dependencies = [
+    "httpx>=0.24.0",
+    "pydantic>=2.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["veillabs"]
