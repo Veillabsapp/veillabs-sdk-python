@@ -52,14 +52,14 @@ with VeilLabsClient() as client:
     print(f"Supported Currencies: {len(currencies)}")
 
     # 2. Get an exchange estimate
-    estimate = client.market.get_estimate(
-        fromTicker="eth",
-        toTicker="usdc",
-        fromAmount="1.0",
-        fromNetwork="mainnet",
-        toNetwork="mainnet"
-    )
-    print(f"1 ETH = {estimate.to_amount} USDC")
+    estimate = client.market.get_estimate({
+        "ticker_from": "eth",
+        "ticker_to": "usdc",
+        "amount": "1.0",
+        "network_from": "mainnet",
+        "network_to": "mainnet"
+    })
+    print(f"1 ETH = {estimate.estimated_amount} USDC")
 ```
 
 ### Asynchronous Client
@@ -68,13 +68,21 @@ Recommended for high-concurrency environments like web services (FastAPI, Django
 
 ```python
 import asyncio
-from veillabs import AsyncVeilLabsClient
+from veillabs import AsyncVeilLabsClient, SwapRequest
 
 async def main():
     async with AsyncVeilLabsClient() as client:
-        # Fetch platform stats
-        stats = await client.stats.get_volume()
-        print(f"Total Platform Volume: ${stats.total_volume_usd:,.2f}")
+        # Create a swap using a Pydantic model for full type safety
+        req = SwapRequest(
+            ticker_from="eth",
+            ticker_to="usdt",
+            amount="1.0",
+            address_to="0x123...",
+            network_from="mainnet",
+            network_to="bsc"
+        )
+        swap = await client.swap.create(req)
+        print(f"Swap created with ID: {swap.id}")
 
 if __name__ == "__main__":
     asyncio.run(main())
@@ -90,23 +98,33 @@ Access real-time data about the platform's supported assets and trading pairs.
 
 - `get_currencies()`: Retrieve list of all supported cryptocurrencies.
 - `get_pairs(ticker, net)`: Get valid trading destinations for a specific asset.
-- `get_estimate(**params)`: Calculate real-time exchange rates and output values.
-- `get_ranges(**params)`: Determine minimum and maximum transaction limits.
+- `get_estimate(params)`: Calculate real-time exchange rates. Accepts `EstimateRequest` or `dict`.
+- `get_ranges(params)`: Determine transaction limits. Accepts `RangeRequest` or `dict`.
 
 ### 2. Private Swaps (`client.swap`)
 
 Initiate anonymous cross-chain or same-chain token exchanges.
 
 ```python
-swap = client.swap.create(
-    fromTicker="eth",
-    toTicker="btc",
+from veillabs import SwapRequest
+
+# Option A: Using the SwapRequest model (Recommended)
+req = SwapRequest(
+    ticker_from="eth",
+    ticker_to="btc",
     amount="0.5",
-    addressTo="1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
-    fromNetwork="mainnet",
-    toNetwork="mainnet"
+    address_to="1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2",
+    network_from="mainnet",
+    network_to="mainnet"
 )
-print(f"Swap Created! Tracking ID: {swap.id}")
+swap = client.swap.create(req)
+
+# Option B: Using a dictionary
+swap = client.swap.create({
+    "ticker_from": "eth",
+    "ticker_to": "btc",
+    ...
+})
 ```
 
 ### 3. Private Seed Distribution (`client.seed`)
@@ -114,23 +132,27 @@ print(f"Swap Created! Tracking ID: {swap.id}")
 Distribute a fixed amount of cryptocurrency to multiple recipient addresses.
 
 ```python
-seed = client.seed.create(
-    ticker="usdt",
-    totalAmount="1000",
+from veillabs import SeedRequest
+
+seed = client.seed.create(SeedRequest(
+    ticker_from="usdt",
+    ticker_to="usdt",
+    amount="1000",
     destinations=[
-        {"address": "0x123...", "percentage": 50},
-        {"address": "0x456...", "percentage": 50}
+        {"address": "0x123...", "percentage": 50, "ticker": "usdt", "network": "bsc"},
+        {"address": "0x456...", "percentage": 50, "ticker": "usdt", "network": "bsc"}
     ],
-    network="bsc"
-)
+    network_from="bsc",
+    network_to="bsc"
+))
 ```
 
 ### 4. Proxy Transfers (`client.transfer`)
 
 Move funds securely through the Veil Labs proxy nodes to obfuscate the transaction path.
 
-- `client.transfer.single(**params)`: Secure transfer to one recipient.
-- `client.transfer.multi(**params)`: Secure transfer to multiple recipients.
+- `client.transfer.single(params)`: Secure transfer to one recipient.
+- `client.transfer.multi(params)`: Secure transfer to multiple recipients.
 
 ### 5. Unified Transaction Tracking (`client.track`)
 
@@ -141,18 +163,30 @@ status = client.track("TRANSACTION_ID")
 print(f"Current Status: {status.status}") # e.g., 'pending', 'completed'
 ```
 
+
 ---
 
 ## 📊 Models & Data Structures
 
-Every response is returned as a **Pydantic** model, providing built-in validation and type hinting.
+The SDK uses **Pydantic** for both requests and responses, providing built-in validation and IDE autocompletion.
+
+### Request Models (Input)
+
+| Model | Purpose |
+| :--- | :--- |
+| `EstimateRequest` | Parameters for rate calculations. |
+| `SwapRequest` | Parameters for creating a private swap. |
+| `SeedRequest` | Parameters for asset distribution. |
+| `TransferRequest` | Parameters for a single proxy transfer. |
+
+### Response Models (Output)
 
 | Model | Purpose |
 | :--- | :--- |
 | `Currency` | Details about an asset (ticker, name, network, logo). |
 | `Pair` | Details about available trading pairs. |
 | `Estimate` | Rate and amount calculation results. |
-| `SwapResponse` | Success response and metadata for new swaps. |
+| `SwapResponse` | Success response for new swaps. |
 | `TrackingResponse` | Universal status check result. |
 
 ---
@@ -163,16 +197,18 @@ The SDK utilizes `httpx` and raises standard status exceptions for API errors.
 
 ```python
 import httpx
-from veillabs import VeilLabsClient
+from veillabs import VeilLabsClient, EstimateRequest
 
 try:
     with VeilLabsClient() as client:
-        result = client.market.get_estimate(fromTicker="eth", ...)
+        req = EstimateRequest(from_ticker="eth", ...)
+        result = client.market.get_estimate(req)
 except httpx.HTTPStatusError as e:
     print(f"API returned error: {e.response.status_code}")
 except Exception as e:
     print(f"Connection error: {e}")
 ```
+
 
 ---
 
