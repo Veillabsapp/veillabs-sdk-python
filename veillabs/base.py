@@ -20,6 +20,27 @@ class BaseSubClient:
         """
         self.client = client
 
+    def _raise_for_status(self, response: httpx.Response):
+        """
+        Custom status check that provides more detailed error messages
+        from the Veil Labs API when available.
+        """
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if response.status_code == 400:
+                try:
+                    error_data = response.json()
+                    message = error_data.get(
+                        "message", error_data.get("error", response.text)
+                    )
+                    raise ValueError(
+                        f"Veil Labs API Error (400 Bad Request): {message}"
+                    ) from e
+                except Exception:
+                    pass
+            raise e
+
     @property
     def base_url(self) -> str:
         """

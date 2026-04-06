@@ -18,9 +18,10 @@ class TransferSubClient(BaseAsyncSubClient):
             params = TransferRequest(**params)
 
         response = await self.http_client.post(
-            f"{self.base_url}/transfer", json=params.model_dump(by_alias=True)
+            f"{self.base_url}/transfer",
+            json=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return TransferResponse(**response.json())
 
     async def multi(
@@ -33,7 +34,8 @@ class TransferSubClient(BaseAsyncSubClient):
             params = MultiTransferRequest(**params)
 
         response = await self.http_client.post(
-            f"{self.base_url}/transfer/multi", json=params.model_dump(by_alias=True)
+            f"{self.base_url}/transfer/multi",
+            json=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return TransferResponse(**response.json())

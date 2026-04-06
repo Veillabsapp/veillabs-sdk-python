@@ -1,4 +1,3 @@
-from typing import Dict, Any
 from ..base import BaseSyncSubClient
 from ..models import VolumeResponse
 
@@ -13,5 +12,5 @@ class StatsSubClient(BaseSyncSubClient):
         Retrieves total trade volume in USD for the platform.
         """
         response = self.http_client.get(f"{self.base_url}/volume")
-        response.raise_for_status()
+        self._raise_for_status(response)
         return VolumeResponse(**response.json())

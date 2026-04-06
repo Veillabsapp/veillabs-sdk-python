@@ -1,4 +1,3 @@
-from typing import Dict, Any
 import httpx
 from ._sync.market import MarketSubClient
 from ._sync.swap import SwapSubClient

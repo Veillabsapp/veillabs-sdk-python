@@ -16,9 +16,10 @@ class SeedSubClient(BaseSyncSubClient):
             params = SeedRequest(**params)
 
         response = self.http_client.post(
-            f"{self.base_url}/seed/create", json=params.model_dump(by_alias=True)
+            f"{self.base_url}/seed/create",
+            json=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return SeedResponse(**response.json())
 
     def get_status(self, seed_id: str) -> SeedResponse:
@@ -26,5 +27,5 @@ class SeedSubClient(BaseSyncSubClient):
         Retrieves the current status of a specific seed distribution.
         """
         response = self.http_client.get(f"{self.base_url}/seed/status/{seed_id}")
-        response.raise_for_status()
+        self._raise_for_status(response)
         return SeedResponse(**response.json())

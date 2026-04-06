@@ -16,7 +16,7 @@ class MarketSubClient(BaseSyncSubClient):
             A list of Currency objects representing supported assets.
         """
         response = self.http_client.get(f"{self.base_url}/currencies")
-        response.raise_for_status()
+        self._raise_for_status(response)
         return [Currency(**c) for c in response.json()]
 
     def get_pairs(self, ticker: str, net: str) -> List[Pair]:
@@ -31,7 +31,7 @@ class MarketSubClient(BaseSyncSubClient):
             A list of Pair objects showing valid trade destinations.
         """
         response = self.http_client.get(f"{self.base_url}/pairs/{ticker}/{net}")
-        response.raise_for_status()
+        self._raise_for_status(response)
         return [Pair(**p) for p in response.json()]
 
     def get_estimate(self, params: Union[EstimateRequest, Dict[str, Any]]) -> Estimate:
@@ -42,9 +42,10 @@ class MarketSubClient(BaseSyncSubClient):
             params = EstimateRequest(**params)
 
         response = self.http_client.get(
-            f"{self.base_url}/estimates", params=params.model_dump(by_alias=True)
+            f"{self.base_url}/estimates",
+            params=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return Estimate(**response.json())
 
     def get_ranges(self, params: Union[RangeRequest, Dict[str, Any]]) -> Range:
@@ -55,7 +56,8 @@ class MarketSubClient(BaseSyncSubClient):
             params = RangeRequest(**params)
 
         response = self.http_client.get(
-            f"{self.base_url}/ranges", params=params.model_dump(by_alias=True)
+            f"{self.base_url}/ranges",
+            params=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return Range(**response.json())

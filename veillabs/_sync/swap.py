@@ -16,9 +16,10 @@ class SwapSubClient(BaseSyncSubClient):
             params = SwapRequest(**params)
 
         response = self.http_client.post(
-            f"{self.base_url}/exchanges", json=params.model_dump(by_alias=True)
+            f"{self.base_url}/exchanges",
+            json=params.model_dump(by_alias=True, exclude_none=True),
         )
-        response.raise_for_status()
+        self._raise_for_status(response)
         return SwapResponse(**response.json())
 
     def get_status(self, swap_id: str) -> SwapResponse:
