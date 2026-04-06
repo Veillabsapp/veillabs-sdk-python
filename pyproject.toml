@@ -6,12 +6,16 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Veil Labs", email = "[EMAIL_ADDRESS]"},
+    {name = "Veil Labs", email = "info@veillabs.app"},
 ]
 dependencies = [
     "httpx>=0.24.0",
     "pydantic>=2.0.0",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["veillabs"]
