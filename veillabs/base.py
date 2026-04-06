@@ -14,7 +14,7 @@ class BaseSubClient:
     def __init__(self, client: Union["VeilLabsClient", "AsyncVeilLabsClient"]):
         """
         Initializes a sub-client with a reference to the main SDK client.
-        
+
         Args:
             client: The main VeilLabsClient or AsyncVeilLabsClient instance.
         """

@@ -7,14 +7,16 @@ from ._sync.transfer import TransferSubClient
 from ._sync.stats import StatsSubClient
 from .models import TrackingResponse
 
+
 class VeilLabsClient:
     """
     Synchronous client for the Veil Labs API.
     """
+
     def __init__(self, base_url: str = "https://trade.veillabs.app/api"):
         """
         Initializes the synchronous Veil Labs client.
-        
+
         Args:
             base_url: The base API URL.
         """

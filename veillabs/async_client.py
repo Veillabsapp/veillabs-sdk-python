@@ -7,14 +7,16 @@ from ._async.transfer import TransferSubClient
 from ._async.stats import StatsSubClient
 from .models import TrackingResponse
 
+
 class AsyncVeilLabsClient:
     """
     Asynchronous client for the Veil Labs API.
     """
+
     def __init__(self, base_url: str = "https://trade.veillabs.app/api"):
         """
         Initializes the asynchronous Veil Labs client.
-        
+
         Args:
             base_url: The base API URL.
         """
@@ -30,7 +32,9 @@ class AsyncVeilLabsClient:
         """
         Retrieves the status of any transaction using its tracking ID.
         """
-        response = await self._http_client.get(f"{self.base_url}/tracking/{tracking_id}")
+        response = await self._http_client.get(
+            f"{self.base_url}/tracking/{tracking_id}"
+        )
         response.raise_for_status()
         return TrackingResponse(**response.json())
 

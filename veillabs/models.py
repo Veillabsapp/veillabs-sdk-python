@@ -42,6 +42,27 @@ class Pair(BaseModel):
     to_network: str = Field(alias="toNetwork")
 
 
+class EstimateRequest(BaseModel):
+    """
+    Request parameters for an exchange estimate.
+
+    Attributes:
+        from_ticker: Source currency ticker.
+        to_ticker: Target currency ticker.
+        from_amount: Input amount.
+        from_network: Source blockchain network.
+        to_network: Target blockchain network.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    from_ticker: str = Field(alias="fromTicker")
+    to_ticker: str = Field(alias="toTicker")
+    from_amount: str = Field(alias="fromAmount")
+    from_network: str = Field(alias="fromNetwork")
+    to_network: str = Field(alias="toNetwork")
+
+
 class Estimate(BaseModel):
     """
     Exchange rate and amount estimation for a trade.
@@ -59,6 +80,25 @@ class Estimate(BaseModel):
     rate: str
 
 
+class RangeRequest(BaseModel):
+    """
+    Request parameters for retrieving transaction ranges.
+
+    Attributes:
+        from_ticker: Source currency ticker.
+        to_ticker: Target currency ticker.
+        from_network: Source blockchain network.
+        to_network: Target blockchain network.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    from_ticker: str = Field(alias="fromTicker")
+    to_ticker: str = Field(alias="toTicker")
+    from_network: str = Field(alias="fromNetwork")
+    to_network: str = Field(alias="toNetwork")
+
+
 class Range(BaseModel):
     """
     Minimum and maximum transaction limits for a pair.
@@ -72,6 +112,29 @@ class Range(BaseModel):
 
     min_amount: str = Field(alias="minAmount")
     max_amount: Optional[str] = Field(alias="maxAmount", default=None)
+
+
+class SwapRequest(BaseModel):
+    """
+    Request parameters for creating a new private swap.
+
+    Attributes:
+        from_ticker: Source currency ticker.
+        to_ticker: Target currency ticker.
+        amount: Transaction amount.
+        address_to: Destination wallet address.
+        from_network: Source blockchain network.
+        to_network: Target blockchain network.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    from_ticker: str = Field(alias="fromTicker")
+    to_ticker: str = Field(alias="toTicker")
+    amount: str
+    address_to: str = Field(alias="addressTo")
+    from_network: str = Field(alias="fromNetwork")
+    to_network: str = Field(alias="toNetwork")
 
 
 class SwapResponse(BaseModel):
@@ -99,6 +162,36 @@ class SwapResponse(BaseModel):
     created_at: Optional[str] = Field(alias="createdAt", default=None)
 
 
+class SeedDestination(BaseModel):
+    """
+    Distribution target node for a private seed transaction.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    address: str
+    percentage: float
+
+
+class SeedRequest(BaseModel):
+    """
+    Request parameters for creating a private seed distribution.
+
+    Attributes:
+        ticker: Currency ticker to distribute.
+        total_amount: Total amount across all destination nodes.
+        destinations: List of recipient nodes with percentage shares.
+        network: Blockchain network for distribution.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    ticker: str
+    total_amount: str = Field(alias="totalAmount")
+    destinations: List[SeedDestination]
+    network: str
+
+
 class SeedResponse(BaseModel):
     """
     Response details for a created seed distribution.
@@ -116,6 +209,55 @@ class SeedResponse(BaseModel):
     status: str
     total_amount: str = Field(alias="totalAmount")
     created_at: Optional[str] = Field(alias="createdAt", default=None)
+
+
+class TransferRequest(BaseModel):
+    """
+    Request parameters for a single private proxy transfer.
+
+    Attributes:
+        ticker: Currency ticker to transfer.
+        amount: Amount to send.
+        address_to: Destination wallet address.
+        network: Blockchain network for transfer.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    ticker: str
+    amount: str
+    address_to: str = Field(alias="addressTo")
+    network: str
+
+
+class MultiTransferDestination(BaseModel):
+    """
+    Individual recipient for a multi-destination transfer.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    address: str
+    amount: str
+
+
+class MultiTransferRequest(BaseModel):
+    """
+    Request parameters for a multi-destination private transfer.
+
+    Attributes:
+        ticker: Currency ticker to transfer.
+        total_amount: Total cumulative amount for all recipients.
+        destinations: List of recipients and their specific amounts.
+        network: Blockchain network for transfer.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    ticker: str
+    total_amount: str = Field(alias="totalAmount")
+    destinations: List[MultiTransferDestination]
+    network: str
 
 
 class TransferResponse(BaseModel):

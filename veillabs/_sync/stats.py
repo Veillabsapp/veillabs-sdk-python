@@ -2,10 +2,12 @@ from typing import Dict, Any
 from ..base import BaseSyncSubClient
 from ..models import VolumeResponse
 
+
 class StatsSubClient(BaseSyncSubClient):
     """
     Synchronous sub-client for accessing platform global metrics.
     """
+
     def get_volume(self) -> VolumeResponse:
         """
         Retrieves total trade volume in USD for the platform.

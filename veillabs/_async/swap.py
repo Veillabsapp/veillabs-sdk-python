@@ -1,16 +1,23 @@
-from typing import Dict, Any
+from typing import Dict, Any, Union
 from ..base import BaseAsyncSubClient
-from ..models import SwapResponse
+from ..models import SwapResponse, SwapRequest
+
 
 class SwapSubClient(BaseAsyncSubClient):
     """
     Asynchronous sub-client for private swap operations.
     """
-    async def create(self, **params) -> SwapResponse:
+
+    async def create(self, params: Union[SwapRequest, Dict[str, Any]]) -> SwapResponse:
         """
         Creates a new private swap transaction.
         """
-        response = await self.http_client.post(f"{self.base_url}/exchanges", json=params)
+        if isinstance(params, dict):
+            params = SwapRequest(**params)
+
+        response = await self.http_client.post(
+            f"{self.base_url}/exchanges", json=params.model_dump(by_alias=True)
+        )
         response.raise_for_status()
         return SwapResponse(**response.json())
 
