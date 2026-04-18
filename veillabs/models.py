@@ -163,56 +163,6 @@ class SeedResponse(BaseModel):
     destinations: List[Any]
 
 
-class TransferRequest(BaseModel):
-    """
-    Request parameters for a single private proxy transfer.
-    """
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    private_key: str = Field(alias="privateKey")
-    destination: str
-    amount: str
-    network: str
-    token: str
-
-
-class MultiTransferDestination(BaseModel):
-    """
-    Individual recipient for a multi-destination transfer.
-    """
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    address: str
-    amount: float
-
-
-class MultiTransferRequest(BaseModel):
-    """
-    Request parameters for a multi-destination private transfer.
-    """
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    private_key: str = Field(alias="privateKey")
-    network: str
-    token: str
-    total_amount: str = Field(alias="totalAmount")
-    destinations: List[MultiTransferDestination]
-
-
-class TransferResponse(BaseModel):
-    """
-    Response details for a private proxy transfer.
-    """
-
-    model_config = ConfigDict(populate_by_name=True)
-
-    id: str
-    message: str
-    status: str
-
 
 class TrackingResponse(BaseModel):
     """

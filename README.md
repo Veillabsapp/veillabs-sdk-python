@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Veillabsapp/veillabs-sdk-python.git)
 
-The official Python SDK for **Veil Labs**, a privacy-first platform providing anonymous swaps (Private Swap), multi-destination distributions (Private Seed), and secure proxy transfers across multiple blockchain networks.
+The official Python SDK for **Veil Labs**, a privacy-first platform providing anonymous swaps (Private Swap) and multi-destination distributions (Private Seed) across multiple blockchain networks.
 
 ---
 
@@ -13,7 +13,6 @@ The official Python SDK for **Veil Labs**, a privacy-first platform providing an
 
 - **Private Swaps**: Securely exchange tokens with built-in privacy.
 - **Private Seed Distribution**: Distribute assets to multiple destination addresses in a single privacy-preserving transaction.
-- **Proxy Transfers**: Anonymize your transfers via secure proxy nodes.
 - **Market Intelligence**: Real-time access to supported currencies, pairs, and price estimates.
 - **Dual Support**: Native support for both **Synchronous** and **Asynchronous** (asyncio) workflows.
 - **Type-Safe Models**: Fully powered by Pydantic for robust data validation and IDE autocompletion.
@@ -147,13 +146,6 @@ seed = client.seed.create(SeedRequest(
 ))
 ```
 
-### 4. Proxy Transfers (`client.transfer`)
-
-Move funds securely through the Veil Labs proxy nodes to obfuscate the transaction path.
-
-- `client.transfer.single(params)`: Secure transfer to one recipient.
-- `client.transfer.multi(params)`: Secure transfer to multiple recipients.
-
 ### 5. Unified Transaction Tracking (`client.track`)
 
 Maintain full visibility of your transaction progress using the unified `track` method.
@@ -177,7 +169,6 @@ The SDK uses **Pydantic** for both requests and responses, providing built-in va
 | `EstimateRequest` | Parameters for rate calculations. |
 | `SwapRequest` | Parameters for creating a private swap. |
 | `SeedRequest` | Parameters for asset distribution. |
-| `TransferRequest` | Parameters for a single proxy transfer. |
 
 ### Response Models (Output)
 
@@ -201,8 +192,9 @@ from veillabs import VeilLabsClient, EstimateRequest
 
 try:
     with VeilLabsClient() as client:
-        req = EstimateRequest(from_ticker="eth", ...)
+        req = EstimateRequest(ticker_from="eth", ...)
         result = client.market.get_estimate(req)
+
 except httpx.HTTPStatusError as e:
     print(f"API returned error: {e.response.status_code}")
 except Exception as e:

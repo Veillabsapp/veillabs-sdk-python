@@ -4,7 +4,7 @@ Example: Unified Usage (Synchronous)
 
 This script demonstrates how to work with multiple modules in a single
 Veil Labs sync client session, including market estimates,
-proxy transfers, and transaction tracking.
+and transaction tracking.
 """
 
 from veillabs import VeilLabsClient, SwapRequest

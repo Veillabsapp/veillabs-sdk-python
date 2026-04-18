@@ -4,7 +4,7 @@ Example: Unified Usage (Asynchronous)
 
 This script demonstrates how to work with multiple modules in a single
 Veil Labs async client session, including market estimates,
-proxy transfers, and transaction tracking.
+and transaction tracking.
 """
 
 import asyncio

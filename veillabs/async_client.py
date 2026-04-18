@@ -2,7 +2,6 @@ import httpx
 from ._async.market import MarketSubClient
 from ._async.swap import SwapSubClient
 from ._async.seed import SeedSubClient
-from ._async.transfer import TransferSubClient
 from ._async.stats import StatsSubClient
 from .models import TrackingResponse
 
@@ -24,7 +23,6 @@ class AsyncVeilLabsClient:
         self.market = MarketSubClient(self)
         self.swap = SwapSubClient(self)
         self.seed = SeedSubClient(self)
-        self.transfer = TransferSubClient(self)
         self.stats = StatsSubClient(self)
 
     async def track(self, tracking_id: str) -> TrackingResponse:

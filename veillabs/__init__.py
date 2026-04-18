@@ -25,7 +25,6 @@ from .models import (
     Range,
     SwapResponse,
     SeedResponse,
-    TransferResponse,
     TrackingResponse,
     VolumeResponse,
     EstimateRequest,
@@ -33,9 +32,6 @@ from .models import (
     SwapRequest,
     SeedRequest,
     SeedDestination,
-    TransferRequest,
-    MultiTransferRequest,
-    MultiTransferDestination,
 )
 
 __all__ = [
@@ -47,7 +43,6 @@ __all__ = [
     "Range",
     "SwapResponse",
     "SeedResponse",
-    "TransferResponse",
     "TrackingResponse",
     "VolumeResponse",
     "EstimateRequest",
@@ -55,7 +50,4 @@ __all__ = [
     "SwapRequest",
     "SeedRequest",
     "SeedDestination",
-    "TransferRequest",
-    "MultiTransferRequest",
-    "MultiTransferDestination",
 ]

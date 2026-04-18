@@ -2,7 +2,6 @@ import httpx
 from ._sync.market import MarketSubClient
 from ._sync.swap import SwapSubClient
 from ._sync.seed import SeedSubClient
-from ._sync.transfer import TransferSubClient
 from ._sync.stats import StatsSubClient
 from .models import TrackingResponse
 
@@ -24,7 +23,6 @@ class VeilLabsClient:
         self.market = MarketSubClient(self)
         self.swap = SwapSubClient(self)
         self.seed = SeedSubClient(self)
-        self.transfer = TransferSubClient(self)
         self.stats = StatsSubClient(self)
 
     def track(self, tracking_id: str) -> TrackingResponse:
